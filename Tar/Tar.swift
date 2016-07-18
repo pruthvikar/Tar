@@ -17,9 +17,9 @@ extension String {
 extension Tar {
 
 
-  public static func untar(path: String, toPath: String, usingDecompression: NSData.Algorithm? = nil) {
+  public static func untar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
     let data : NSData = {
-      if let algorithm = usingDecompression {
+      if let algorithm = using {
         return NSData(contentsOfFile: path)!.decompressedData(algorithm)!
       } else {
         return NSData(contentsOfFile: path)!
@@ -28,8 +28,8 @@ extension Tar {
     untar(data, toPath: toPath)
   }
 
-  func untar(data:NSData, toPath: String, usingDecompression: NSData.Algorithm? = nil) {
-      if let algorithm = usingDecompression {
+  public func untar(data:NSData, toPath: String, using: NSData.Algorithm? = nil) {
+      if let algorithm = using {
         untar(data.decompressedData(algorithm)!, toPath: toPath)
       } else {
         untar(data, toPath: toPath)
@@ -37,7 +37,7 @@ extension Tar {
     }
 
 
-  public static func untar(data: NSData, toPath: String) {
+  static func untar(data: NSData, toPath: String) {
     let fileManager = NSFileManager.defaultManager()
     try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
 
@@ -62,29 +62,26 @@ extension Tar {
     }
   }
 
-  //  func tar(path:String, usingCompression: Algorithm? = nil) -> NSData
-  //  func tar(path:String, path: String, usingCompression: Algorithm? = nil)
 
-
-  public static func tar(path: String, toPath: String, usingCompression: NSData.Algorithm? = nil) {
+  public static func tar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
     let data = tar(path)
-    if let algorithm = usingCompression {
+    if let algorithm = using {
       data.compressedData(algorithm)!.writeToFile(toPath, atomically: true)
     } else {
       data.writeToFile(toPath, atomically: true)
     }
   }
 
-  public static func tar(path:String, usingCompression: NSData.Algorithm? = nil) -> NSData {
+  public static func tar(path:String, using: NSData.Algorithm? = nil) -> NSData {
     let data = tar(path)
-    if let algorithm = usingCompression {
+    if let algorithm = using {
       return data.compressedData(algorithm)!
     } else {
       return data
     }
   }
 
-  public static func tar(path: String) -> NSData {
+  static func tar(path: String) -> NSData {
 
     let fm = NSFileManager.defaultManager()
     let md = NSMutableData()
@@ -109,18 +106,6 @@ extension Tar {
 }
 
 public struct Tar {
-
-  static func compress(inPath: String, outPath: String, using: NSData.Algorithm) {
-    let dataToCompress = Tar.tar(inPath)
-    let compressedData = dataToCompress.compressedData(using)!
-    NSFileManager.defaultManager().createFileAtPath(outPath, contents: compressedData, attributes: nil)
-  }
-
-  static func decompress(inPath: String, outPath: String, using: NSData.Algorithm) {
-    let compressedData = NSFileManager.defaultManager().contentsAtPath(inPath)
-    let data: NSData = (compressedData?.decompressedData(using)!)!
-    Tar.untar(data, toPath: outPath)
-  }
 
   // const definition
   private static let TAR_BLOCK_SIZE = 512
