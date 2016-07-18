@@ -14,7 +14,7 @@ extension String {
   }
 }
 
-struct Tar {
+public struct Tar {
 
   static func compress(inPath: String, outPath: String, using: NSData.Algorithm) {
     let dataToCompress = Tar.tar(inPath)
@@ -93,7 +93,7 @@ struct Tar {
 
 
 
-  static func untar(data: NSData, toPath: String) {
+  public static func untar(data: NSData, toPath: String) {
     let fileManager = NSFileManager.defaultManager()
     try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
 
@@ -121,6 +121,29 @@ struct Tar {
 
   }
 
+  public static func tar(path: String) -> NSData {
+
+    let fm = NSFileManager.defaultManager()
+    let md = NSMutableData()
+    if fm.fileExistsAtPath(path) {
+
+      for filePath in fm.enumeratorAtPath(path)! {
+        var isDir: ObjCBool = ObjCBool(false)
+
+        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
+        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
+        md.appendData(tarContent)
+      }
+      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
+      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
+      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
+      return md as NSData
+    }
+
+    return NSData()
+  }
+
+
 
   private static func writeFileDataFor(data: NSData, atLocation: UInt64, withLength: Int, atPath: String) {
     NSFileManager.defaultManager().createFileAtPath(atPath, contents: data.subdataWithRange(NSRange(location: Int(atLocation), length: Int(withLength))), attributes: nil)
@@ -144,27 +167,6 @@ struct Tar {
     return strtol(sizeString, nil, 8)
   }
 
-  static func tar(path: String) -> NSData {
-
-    let fm = NSFileManager.defaultManager()
-    let md = NSMutableData()
-    if fm.fileExistsAtPath(path) {
-
-      for filePath in fm.enumeratorAtPath(path)! {
-        var isDir: ObjCBool = ObjCBool(false)
-
-        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
-        md.appendData(tarContent)
-      }
-      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
-      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
-      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
-      return md as NSData
-    }
-
-    return NSData()
-  }
 
   private static func binaryEncodeData(forPath: String, inDirectory: String, isDirectory: Bool) -> NSData {
 

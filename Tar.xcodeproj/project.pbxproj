@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		84C4BA011D3CD28100E07625 /* Tar.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C4BA001D3CD28100E07625 /* Tar.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		84C4BA081D3CD28100E07625 /* Tar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4B9FD1D3CD28100E07625 /* Tar.framework */; };
-		84C4BA191D3CD2AA00E07625 /* NSData+Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA171D3CD2AA00E07625 /* NSData+Compression.swift */; };
+		84C4BA191D3CD2AA00E07625 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA171D3CD2AA00E07625 /* Compression.swift */; };
 		84C4BA1A1D3CD2AA00E07625 /* Tar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA181D3CD2AA00E07625 /* Tar.swift */; };
 		84C4BA211D3CD2B800E07625 /* TestData.tar in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1B1D3CD2B800E07625 /* TestData.tar */; };
 		84C4BA221D3CD2B800E07625 /* TestData.lz4 in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1C1D3CD2B800E07625 /* TestData.lz4 */; };
@@ -38,7 +38,7 @@
 		84C4BA021D3CD28100E07625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84C4BA071D3CD28100E07625 /* TarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84C4BA0E1D3CD28100E07625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		84C4BA171D3CD2AA00E07625 /* NSData+Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSData+Compression.swift"; sourceTree = "<group>"; };
+		84C4BA171D3CD2AA00E07625 /* Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
 		84C4BA181D3CD2AA00E07625 /* Tar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tar.swift; sourceTree = "<group>"; };
 		84C4BA1B1D3CD2B800E07625 /* TestData.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = TestData.tar; sourceTree = "<group>"; };
 		84C4BA1C1D3CD2B800E07625 /* TestData.lz4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lz4; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				84C4BA001D3CD28100E07625 /* Tar.h */,
-				84C4BA171D3CD2AA00E07625 /* NSData+Compression.swift */,
+				84C4BA171D3CD2AA00E07625 /* Compression.swift */,
 				84C4BA181D3CD2AA00E07625 /* Tar.swift */,
 				84C4BA021D3CD28100E07625 /* Info.plist */,
 			);
@@ -232,7 +232,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84C4BA191D3CD2AA00E07625 /* NSData+Compression.swift in Sources */,
+				84C4BA191D3CD2AA00E07625 /* Compression.swift in Sources */,
 				84C4BA1A1D3CD2AA00E07625 /* Tar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
