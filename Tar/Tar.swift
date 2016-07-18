@@ -25,19 +25,58 @@ extension Tar {
         return NSData(contentsOfFile: path)!
       }
     }()
-    untar(data, toPath: toPath)
+    _untar(data, toPath: toPath)
   }
 
-  public func untar(data:NSData, toPath: String, using: NSData.Algorithm? = nil) {
+  public static func untar(data:NSData, toPath: String, using: NSData.Algorithm? = nil) {
       if let algorithm = using {
-        untar(data.decompressedData(algorithm)!, toPath: toPath)
+        _untar(data.decompressedData(algorithm)!, toPath: toPath)
       } else {
-        untar(data, toPath: toPath)
+        _untar(data, toPath: toPath)
       }
     }
 
+  public static func tar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
+    let data = _tar(path)
+    if let algorithm = using {
+      data.compressedData(algorithm)!.writeToFile(toPath, atomically: true)
+    } else {
+      data.writeToFile(toPath, atomically: true)
+    }
+  }
 
-  static func untar(data: NSData, toPath: String) {
+  public static func tar(path:String, using: NSData.Algorithm? = nil) -> NSData {
+    let data = _tar(path)
+    if let algorithm = using {
+      return data.compressedData(algorithm)!
+    } else {
+      return data
+    }
+  }
+
+  static func _tar(path: String) -> NSData {
+
+    let fm = NSFileManager.defaultManager()
+    let md = NSMutableData()
+    if fm.fileExistsAtPath(path) {
+
+      for filePath in fm.enumeratorAtPath(path)! {
+        var isDir: ObjCBool = ObjCBool(false)
+
+        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
+        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
+        md.appendData(tarContent)
+      }
+      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
+      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
+      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
+      return md as NSData
+    }
+
+    return NSData()
+  }
+
+  static func _untar(data: NSData, toPath: String) {
     let fileManager = NSFileManager.defaultManager()
     try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
 
@@ -62,46 +101,6 @@ extension Tar {
     }
   }
 
-
-  public static func tar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
-    let data = tar(path)
-    if let algorithm = using {
-      data.compressedData(algorithm)!.writeToFile(toPath, atomically: true)
-    } else {
-      data.writeToFile(toPath, atomically: true)
-    }
-  }
-
-  public static func tar(path:String, using: NSData.Algorithm? = nil) -> NSData {
-    let data = tar(path)
-    if let algorithm = using {
-      return data.compressedData(algorithm)!
-    } else {
-      return data
-    }
-  }
-
-  static func tar(path: String) -> NSData {
-
-    let fm = NSFileManager.defaultManager()
-    let md = NSMutableData()
-    if fm.fileExistsAtPath(path) {
-
-      for filePath in fm.enumeratorAtPath(path)! {
-        var isDir: ObjCBool = ObjCBool(false)
-
-        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
-        md.appendData(tarContent)
-      }
-      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
-      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
-      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
-      return md as NSData
-    }
-
-    return NSData()
-  }
 
 }
 
