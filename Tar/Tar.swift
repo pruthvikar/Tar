@@ -16,10 +16,26 @@ extension String {
 
 extension Tar {
 
-  public static func untar(path: String, toPath: String) {
-    let data = NSData(contentsOfFile: path)!
+
+  public static func untar(path: String, toPath: String, usingDecompression: NSData.Algorithm? = nil) {
+    let data : NSData = {
+      if let algorithm = usingDecompression {
+        return NSData(contentsOfFile: path)!.decompressedData(algorithm)!
+      } else {
+        return NSData(contentsOfFile: path)!
+      }
+    }()
     untar(data, toPath: toPath)
   }
+
+  func untar(data:NSData, toPath: String, usingDecompression: NSData.Algorithm? = nil) {
+      if let algorithm = usingDecompression {
+        untar(data.decompressedData(algorithm)!, toPath: toPath)
+      } else {
+        untar(data, toPath: toPath)
+      }
+    }
+
 
   public static func untar(data: NSData, toPath: String) {
     let fileManager = NSFileManager.defaultManager()
@@ -46,9 +62,26 @@ extension Tar {
     }
   }
 
-  public static func tar(path: String, toPath: String) {
+  //  func tar(path:String, usingCompression: Algorithm? = nil) -> NSData
+  //  func tar(path:String, path: String, usingCompression: Algorithm? = nil)
+
+
+  public static func tar(path: String, toPath: String, usingCompression: NSData.Algorithm? = nil) {
     let data = tar(path)
-    data.writeToFile(toPath, atomically: true)
+    if let algorithm = usingCompression {
+      data.compressedData(algorithm)!.writeToFile(toPath, atomically: true)
+    } else {
+      data.writeToFile(toPath, atomically: true)
+    }
+  }
+
+  public static func tar(path:String, usingCompression: NSData.Algorithm? = nil) -> NSData {
+    let data = tar(path)
+    if let algorithm = usingCompression {
+      return data.compressedData(algorithm)!
+    } else {
+      return data
+    }
   }
 
   public static func tar(path: String) -> NSData {
