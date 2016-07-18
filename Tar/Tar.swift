@@ -14,6 +14,67 @@ extension String {
   }
 }
 
+extension Tar {
+
+  public static func untar(path: String, toPath: String) {
+    let data = NSData(contentsOfFile: path)!
+    untar(data, toPath: toPath)
+  }
+
+  public static func untar(data: NSData, toPath: String) {
+    let fileManager = NSFileManager.defaultManager()
+    try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
+
+    var location : UInt64 = 0
+
+    while location < UInt64(data.length) {
+      var blockCount : UInt64 = 1
+      let type = typeFor(data, atOffset: location)
+      if type == NullChar || type == ZeroChar {
+        let name = nameFor(data, atOffset: location)
+        let filePath = toPath.stringByAppendingPathComponent(name)
+        let size = sizeFor(data, atOffset: location)
+        print(size)
+        blockCount += UInt64((size - 1) / (TAR_BLOCK_SIZE)) + 1
+        writeFileDataFor(data, atLocation: location + UInt64(TAR_BLOCK_SIZE), withLength: size, atPath: filePath)
+      } else if type == 53 {
+        let name = nameFor(data, atOffset: location)
+        let directoryPath = toPath.stringByAppendingPathComponent(name)
+        try! fileManager.createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil)
+      }
+      location += blockCount * UInt64(TAR_BLOCK_SIZE)
+    }
+  }
+
+  public static func tar(path: String, toPath: String) {
+    let data = tar(path)
+    data.writeToFile(toPath, atomically: true)
+  }
+
+  public static func tar(path: String) -> NSData {
+
+    let fm = NSFileManager.defaultManager()
+    let md = NSMutableData()
+    if fm.fileExistsAtPath(path) {
+
+      for filePath in fm.enumeratorAtPath(path)! {
+        var isDir: ObjCBool = ObjCBool(false)
+
+        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
+        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
+        md.appendData(tarContent)
+      }
+      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
+      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
+      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
+      return md as NSData
+    }
+
+    return NSData()
+  }
+
+}
+
 public struct Tar {
 
   static func compress(inPath: String, outPath: String, using: NSData.Algorithm) {
@@ -91,60 +152,6 @@ public struct Tar {
     00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 32, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 117, 115, 116, 97, 114, 00, 48, 48, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
   ]
 
-
-
-  public static func untar(data: NSData, toPath: String) {
-    let fileManager = NSFileManager.defaultManager()
-    try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
-
-    var location : UInt64 = 0
-
-    while location < UInt64(data.length) {
-      var blockCount : UInt64 = 1
-      let type = typeFor(data, atOffset: location)
-      if type == NullChar || type == ZeroChar {
-        let name = nameFor(data, atOffset: location)
-        print(name,"folder")
-        let filePath = toPath.stringByAppendingPathComponent(name)
-        let size = sizeFor(data, atOffset: location)
-        print(size)
-        blockCount += UInt64((size - 1) / (TAR_BLOCK_SIZE)) + 1
-        writeFileDataFor(data, atLocation: location + UInt64(TAR_BLOCK_SIZE), withLength: size, atPath: filePath)
-      } else if type == 53 {
-        let name = nameFor(data, atOffset: location)
-        print(name,"53")
-        let directoryPath = toPath.stringByAppendingPathComponent(name)
-        try! fileManager.createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil)
-      }
-      location += blockCount * UInt64(TAR_BLOCK_SIZE)
-    }
-
-  }
-
-  public static func tar(path: String) -> NSData {
-
-    let fm = NSFileManager.defaultManager()
-    let md = NSMutableData()
-    if fm.fileExistsAtPath(path) {
-
-      for filePath in fm.enumeratorAtPath(path)! {
-        var isDir: ObjCBool = ObjCBool(false)
-
-        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
-        md.appendData(tarContent)
-      }
-      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
-      memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
-      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
-      return md as NSData
-    }
-
-    return NSData()
-  }
-
-
-
   private static func writeFileDataFor(data: NSData, atLocation: UInt64, withLength: Int, atPath: String) {
     NSFileManager.defaultManager().createFileAtPath(atPath, contents: data.subdataWithRange(NSRange(location: Int(atLocation), length: Int(withLength))), attributes: nil)
   }
@@ -196,20 +203,8 @@ public struct Tar {
 
     let attributes : NSDictionary = attributesOptional!
 
-
-//    let permissions = Int64((attributes[NSFilePosixPermissions]! as! NSNumber).shortValue)
-//    let modificationDate = Int64(attributes[NSFileModificationDate]!.timeIntervalSince1970)
-//    let ownerId = Int64((attributes[NSFileOwnerAccountID]! as! NSNumber).unsignedLongValue)
-//    let groupId = Int64((attributes[NSFileGroupOwnerAccountID]! as! NSNumber).unsignedLongValue)
-//    let ownerName = attributes[NSFileOwnerAccountName] ?? ""
-//    let groupName = attributes[NSFileGroupOwnerAccountName]! as! String
-//    let fileSize = Int64((attributes[NSFileSize]! as! NSNumber).unsignedLongLongValue)
-
-
-
     let permissions = Int64(attributes.filePosixPermissions())
     let modificationDate = Int64(attributes.fileModificationDate()!.timeIntervalSince1970)
-    print(modificationDate)
     let ownerId = Int64(attributes.fileOwnerAccountID()!.integerValue)
     let groupId = Int64(attributes.fileGroupOwnerAccountID()!.integerValue)
     let ownerName = attributes.fileOwnerAccountName() ?? ""
@@ -229,7 +224,7 @@ public struct Tar {
     if nameLength <= USTAR_name_size {
       memcpy(&buffer[USTAR_name_offset], nameChar, nameLength)
     } else {
-      fatalError("Name too long")
+      fatalError("Name too long, not implemented yet")
     }
 
     if isDirectory {
@@ -245,7 +240,6 @@ public struct Tar {
 
     buffer[USTAR_checksum_offset + 6] = NullChar
     formatOctal(Int64(checksum), buffer: &buffer, offset: USTAR_checksum_offset, size: 6)
-//    print(path,buffer.map({Character(UnicodeScalar($0))}))
     return buffer
 
   }
