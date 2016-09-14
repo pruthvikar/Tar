@@ -22,9 +22,9 @@ class TarTests: XCTestCase {
   }
 
   func testArchiveZLIB() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "zlib")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "zlib")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!.compressedData(.ZLIB)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))).compressedData(.zlib)!
     if testData != data {
 
       XCTFail("ZLIB Archive - files are not equal")
@@ -32,27 +32,27 @@ class TarTests: XCTestCase {
   }
 
   func testArchiveLZMA() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lzma")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lzma")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!.compressedData(.LZMA)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))).compressedData(.lzma)!
     if testData != data {
       XCTFail("LZMA Archive - files are not equal")
     }
   }
 
   func testArchiveLZ4() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lz4")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lz4")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!.compressedData(.LZ4)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))).compressedData(.lz4)!
     if testData != data {
       XCTFail("LZ4 Archive - files are not equal")
     }
   }
 
   func testArchiveLZFSE() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lzfse")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lzfse")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!.compressedData(.LZFSE)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))).compressedData(.lzfse)!
     if testData != data {
 
       XCTFail("LZFSE Archive - files are not equal")
@@ -61,9 +61,9 @@ class TarTests: XCTestCase {
 
 
   func testUnarchiveZLIB() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "zlib")!)!.decompressedData(.ZLIB)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "zlib")!))).decompressedData(.zlib)!
     if testData != data {
 
       XCTFail("ZLIB Unarchive - files are not equal")
@@ -71,48 +71,48 @@ class TarTests: XCTestCase {
   }
 
   func testUnarchiveLZMA() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lzma")!)!.decompressedData(.LZMA)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lzma")!))).decompressedData(.lzma)!
     if testData != data {
       XCTFail("LZMA Unarchive - files are not equal")
     }
   }
 
   func testUnarchiveLZFSE() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lzfse")!)!.decompressedData(.LZFSE)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lzfse")!))).decompressedData(.lzfse)!
     if testData != data {
       XCTFail("LZFSE Unarchive - files are not equal")
     }
   }
 
   func testUnarchiveLZ4() {
-    let testData = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "txt")!)!
+    let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "txt")!))
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "lz4")!)!.decompressedData(.LZ4)!
+    let data = (try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "lz4")!))).decompressedData(.lz4)!
     if testData != data {
       XCTFail("LZ4 Unarchive - files are not equal")
     }
   }
 
   func testTar() {
-    let testData = Tar.tar(NSBundle(forClass: TarTests.self).pathForResource("tar", ofType: "")!)
+    let testData = Tar.tar(Bundle(for: TarTests.self).path(forResource: "tar", ofType: "")!)
 
-    let data = NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "tar")!)!
+    let data = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "tar")!))
 
-    if !(testData.length == data.length){
+    if !(testData.count == data.count){
       XCTFail("Tar - data is not equal")
     }
   }
 
   func testUntar() {
-    let testPath = NSTemporaryDirectory().stringByAppendingPathComponent(NSUUID().UUIDString)
-    Tar.untar(NSData(contentsOfFile: NSBundle(forClass: TarTests.self).pathForResource("TestData", ofType: "tar")!)!, toPath: testPath)
-    let dataPath = NSBundle(forClass: TarTests.self).pathForResource("tar", ofType: "")!
+    let testPath = NSTemporaryDirectory().stringByAppendingPathComponent(UUID().uuidString)
+    Tar.untar(try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "tar")!)), toPath: testPath)
+    let dataPath = Bundle(for: TarTests.self).path(forResource: "tar", ofType: "")!
     print("datapath ",dataPath,"\ntestPath",testPath)
-    if !(NSFileManager.defaultManager().contentsEqualAtPath(dataPath.stringByAppendingPathComponent("TestData"), andPath: testPath.stringByAppendingPathComponent("TestData"))){
+    if !(FileManager.default.contentsEqual(atPath: dataPath.stringByAppendingPathComponent("TestData"), andPath: testPath.stringByAppendingPathComponent("TestData"))){
       XCTFail("Untar - data is not equal")
     }
   }

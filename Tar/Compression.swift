@@ -10,36 +10,36 @@ import Compression
 /// let decompressedData = compresison.decompressData(compressedData)
 /// ```
 ///
-extension NSData {
+extension Data {
 
   public enum Algorithm {
-    case LZ4
-    case LZFSE
-    case LZMA
-    case ZLIB
+    case lz4
+    case lzfse
+    case lzma
+    case zlib
 
     public func algorithm() -> compression_algorithm {
       switch self {
-      case .LZ4: return COMPRESSION_LZ4
-      case .LZFSE: return COMPRESSION_LZFSE
-      case .LZMA: return COMPRESSION_LZMA
-      case .ZLIB: return COMPRESSION_ZLIB
+      case .lz4: return COMPRESSION_LZ4
+      case .lzfse: return COMPRESSION_LZFSE
+      case .lzma: return COMPRESSION_LZMA
+      case .zlib: return COMPRESSION_ZLIB
       }
     }
   }
 
-  public func compressedData(usingAlgorithm: Algorithm) -> NSData? {
+  public func compressedData(_ usingAlgorithm: Algorithm) -> Data? {
     return processData(self, algorithm: usingAlgorithm, compress: true)
   }
 
-  public func decompressedData(usingAlgorithm: Algorithm) -> NSData? {
+  public func decompressedData(_ usingAlgorithm: Algorithm) -> Data? {
     return processData(self, algorithm: usingAlgorithm, compress: false)
   }
 
-  private func processData(inputData: NSData, algorithm: Algorithm, compress: Bool) -> NSData? {
-    guard inputData.length > 0 else { return nil }
+  fileprivate func processData(_ inputData: Data, algorithm: Algorithm, compress: Bool) -> Data? {
+    guard inputData.count > 0 else { return nil }
 
-    var stream = UnsafeMutablePointer<compression_stream>.alloc(1).memory
+    var stream = UnsafeMutablePointer<compression_stream>.allocate(capacity: 1).pointee
 
     let initStatus = compression_stream_init(&stream, compress ? COMPRESSION_STREAM_ENCODE : COMPRESSION_STREAM_DECODE, algorithm.algorithm())
     guard initStatus != COMPRESSION_STATUS_ERROR else {
@@ -53,10 +53,10 @@ extension NSData {
 
     let bufferSize = 4096
 
-    stream.src_ptr = UnsafePointer<UInt8>(inputData.bytes)
-    stream.src_size = inputData.length
+    stream.src_ptr = (inputData as NSData).bytes.bindMemory(to: UInt8.self, capacity: inputData.count)
+    stream.src_size = inputData.count
 
-    let buffer = UnsafeMutablePointer<UInt8>.alloc(bufferSize)
+    let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
     stream.dst_ptr = buffer
     stream.dst_size = bufferSize
     let outputData = NSMutableData()
@@ -65,13 +65,13 @@ extension NSData {
       let status = compression_stream_process(&stream, Int32(compress ? COMPRESSION_STREAM_FINALIZE.rawValue : 0))
       if status == COMPRESSION_STATUS_OK {
         guard stream.dst_size == 0 else { continue }
-        outputData.appendBytes(buffer, length: bufferSize)
+        outputData.append(buffer, length: bufferSize)
         stream.dst_ptr = buffer
         stream.dst_size = bufferSize
       } else if status == COMPRESSION_STATUS_END {
         guard stream.dst_ptr > buffer else { continue }
-        outputData.appendBytes(buffer, length: stream.dst_ptr - buffer)
-        return outputData
+        outputData.append(buffer, length: stream.dst_ptr - buffer)
+        return outputData as Data
       } else if status == COMPRESSION_STATUS_ERROR {
         print("[Compression] \(compress ? "Compression" : "Decompression") with \(algorithm) failed with status \(status).")
         return nil

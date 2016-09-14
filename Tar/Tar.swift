@@ -9,26 +9,26 @@
 import Foundation
 
 extension String {
-  func stringByAppendingPathComponent(pathComponent: String) -> String {
-    return (self as NSString).stringByAppendingPathComponent(pathComponent)
+  func stringByAppendingPathComponent(_ pathComponent: String) -> String {
+    return (self as NSString).appendingPathComponent(pathComponent)
   }
 }
 
 extension Tar {
 
 
-  public static func untar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
-    let data : NSData = {
+  public static func untar(_ path: String, toPath: String, using: Data.Algorithm? = nil) {
+    let data : Data = {
       if let algorithm = using {
-        return NSData(contentsOfFile: path)!.decompressedData(algorithm)!
+        return (try! Data(contentsOf: URL(fileURLWithPath: path))).decompressedData(algorithm)!
       } else {
-        return NSData(contentsOfFile: path)!
+        return (try! Data(contentsOf: URL(fileURLWithPath: path)))
       }
     }()
     _untar(data, toPath: toPath)
   }
 
-  public static func untar(data:NSData, toPath: String, using: NSData.Algorithm? = nil) {
+  public static func untar(_ data:Data, toPath: String, using: Data.Algorithm? = nil) {
       if let algorithm = using {
         _untar(data.decompressedData(algorithm)!, toPath: toPath)
       } else {
@@ -36,16 +36,16 @@ extension Tar {
       }
     }
 
-  public static func tar(path: String, toPath: String, using: NSData.Algorithm? = nil) {
+  public static func tar(_ path: String, toPath: String, using: Data.Algorithm? = nil) {
     let data = _tar(path)
     if let algorithm = using {
-      data.compressedData(algorithm)!.writeToFile(toPath, atomically: true)
+      try? data.compressedData(algorithm)!.write(to: URL(fileURLWithPath: toPath), options: [.atomic])
     } else {
-      data.writeToFile(toPath, atomically: true)
+      try? data.write(to: URL(fileURLWithPath: toPath), options: [.atomic])
     }
   }
 
-  public static func tar(path:String, using: NSData.Algorithm? = nil) -> NSData {
+  public static func tar(_ path:String, using: Data.Algorithm? = nil) -> Data {
     let data = _tar(path)
     if let algorithm = using {
       return data.compressedData(algorithm)!
@@ -54,50 +54,49 @@ extension Tar {
     }
   }
 
-  static func _tar(path: String) -> NSData {
+  static func _tar(_ path: String) -> Data {
 
-    let fm = NSFileManager.defaultManager()
+    let fm = FileManager.default
     let md = NSMutableData()
-    if fm.fileExistsAtPath(path) {
+    if fm.fileExists(atPath: path) {
 
-      for filePath in fm.enumeratorAtPath(path)! {
-        var isDir: ObjCBool = ObjCBool(false)
+      for filePath in fm.enumerator(atPath: path)! {
+        var isDir = ObjCBool(false)
 
-        fm.fileExistsAtPath(path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: Bool(isDir))
-        md.appendData(tarContent)
+        fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
+        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: isDir)
+        md.append(tarContent)
       }
-      var block = [UInt8](count: TAR_BLOCK_SIZE * 2, repeatedValue: UInt8())
+      var block = [UInt8](repeating: UInt8(), count: TAR_BLOCK_SIZE * 2)
       memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
-      md.appendData(NSData(bytes: UnsafePointer<UInt8>(block), length: block.count))
-      return md as NSData
+      md.append(Data(bytes: UnsafePointer<UInt8>(UnsafePointer<UInt8>(block)), count: block.count))
+      return md as Data
     }
 
-    return NSData()
+    return Data()
   }
 
-  static func _untar(data: NSData, toPath: String) {
-    let fileManager = NSFileManager.defaultManager()
-    try! fileManager.createDirectoryAtPath(toPath, withIntermediateDirectories: true, attributes: nil)
+  static func _untar(_ data: Data, toPath: String) {
+    let fileManager = FileManager.default
+    try! fileManager.createDirectory(atPath: toPath, withIntermediateDirectories: true, attributes: nil)
 
-    var location : UInt64 = 0
+    var location : Int = 0
 
-    while location < UInt64(data.length) {
-      var blockCount : UInt64 = 1
+    while location < data.count {
+      var blockCount : Int = 1
       let type = typeFor(data, atOffset: location)
       if type == NullChar || type == ZeroChar {
         let name = nameFor(data, atOffset: location)
         let filePath = toPath.stringByAppendingPathComponent(name)
         let size = sizeFor(data, atOffset: location)
-        print(size)
-        blockCount += UInt64((size - 1) / (TAR_BLOCK_SIZE)) + 1
-        writeFileDataFor(data, atLocation: location + UInt64(TAR_BLOCK_SIZE), withLength: size, atPath: filePath)
+        blockCount += (size - 1) / (TAR_BLOCK_SIZE) + 1
+        writeFileDataFor(data, atLocation: location + TAR_BLOCK_SIZE, withLength: size, atPath: filePath)
       } else if type == 53 {
         let name = nameFor(data, atOffset: location)
         let directoryPath = toPath.stringByAppendingPathComponent(name)
-        try! fileManager.createDirectoryAtPath(directoryPath, withIntermediateDirectories: true, attributes: nil)
+        try! fileManager.createDirectory(atPath: directoryPath, withIntermediateDirectories: true, attributes: nil)
       }
-      location += blockCount * UInt64(TAR_BLOCK_SIZE)
+      location += blockCount * TAR_BLOCK_SIZE
     }
   }
 
@@ -107,123 +106,123 @@ extension Tar {
 public struct Tar {
 
   // const definition
-  private static let TAR_BLOCK_SIZE = 512
-  private static let TAR_TYPE_POSITION = 156
-  private static let TAR_NAME_POSITION = 0
-  private static let TAR_NAME_SIZE = 100
-  private static let TAR_SIZE_POSITION = 124
-  private static let TAR_SIZE_SIZE = 12
-  private static let TAR_MAX_BLOCK_LOAD_IN_MEMORY = 100
+  fileprivate static let TAR_BLOCK_SIZE = 512
+  fileprivate static let TAR_TYPE_POSITION = 156
+  fileprivate static let TAR_NAME_POSITION = 0
+  fileprivate static let TAR_NAME_SIZE = 100
+  fileprivate static let TAR_SIZE_POSITION = 124
+  fileprivate static let TAR_SIZE_SIZE = 12
+  fileprivate static let TAR_MAX_BLOCK_LOAD_IN_MEMORY = 100
   /*
    * Define structure of POSIX 'ustar' tar header.
    + Provided by libarchive.
    */
-  private static let	USTAR_name_offset = 0
-  private static let	USTAR_name_size = 100
-  private static let	USTAR_mode_offset = 100
-  private static let	USTAR_mode_size = 6
-  private static let	USTAR_mode_max_size = 8
-  private static let	USTAR_uid_offset = 108
-  private static let	USTAR_uid_size = 6
-  private static let	USTAR_uid_max_size = 8
-  private static let	USTAR_gid_offset = 116
-  private static let	USTAR_gid_size = 6
-  private static let	USTAR_gid_max_size = 8
-  private static let	USTAR_size_offset = 124
-  private static let	USTAR_size_size = 11
-  private static let	USTAR_size_max_size = 12
-  private static let	USTAR_mtime_offset = 136
-  private static let	USTAR_mtime_size = 11
-  private static let	USTAR_mtime_max_size = 11
-  private static let	USTAR_checksum_offset = 148
-  private static let	USTAR_checksum_size = 8
-  private static let	USTAR_typeflag_offset = 156
-  private static let	USTAR_typeflag_size = 1
-  private static let	USTAR_linkname_offset = 157
-  private static let	USTAR_linkname_size = 100
-  private static let	USTAR_magic_offset = 257
-  private static let	USTAR_magic_size = 6
-  private static let	USTAR_version_offset = 263
-  private static let	USTAR_version_size = 2
-  private static let	USTAR_uname_offset = 265
-  private static let	USTAR_uname_size = 32
-  private static let	USTAR_gname_offset = 297
-  private static let	USTAR_gname_size = 32
-  private static let	USTAR_rdevmajor_offset = 329
-  private static let	USTAR_rdevmajor_size = 6
-  private static let	USTAR_rdevmajor_max_size = 8
-  private static let	USTAR_rdevminor_offset = 337
-  private static let	USTAR_rdevminor_size = 6
-  private static let	USTAR_rdevminor_max_size = 8
-  private static let	USTAR_prefix_offset = 345
-  private static let	USTAR_prefix_size = 155
-  private static let	USTAR_padding_offset = 500
-  private static let	USTAR_padding_size = 12
+  fileprivate static let	USTAR_name_offset = 0
+  fileprivate static let	USTAR_name_size = 100
+  fileprivate static let	USTAR_mode_offset = 100
+  fileprivate static let	USTAR_mode_size = 6
+  fileprivate static let	USTAR_mode_max_size = 8
+  fileprivate static let	USTAR_uid_offset = 108
+  fileprivate static let	USTAR_uid_size = 6
+  fileprivate static let	USTAR_uid_max_size = 8
+  fileprivate static let	USTAR_gid_offset = 116
+  fileprivate static let	USTAR_gid_size = 6
+  fileprivate static let	USTAR_gid_max_size = 8
+  fileprivate static let	USTAR_size_offset = 124
+  fileprivate static let	USTAR_size_size = 11
+  fileprivate static let	USTAR_size_max_size = 12
+  fileprivate static let	USTAR_mtime_offset = 136
+  fileprivate static let	USTAR_mtime_size = 11
+  fileprivate static let	USTAR_mtime_max_size = 11
+  fileprivate static let	USTAR_checksum_offset = 148
+  fileprivate static let	USTAR_checksum_size = 8
+  fileprivate static let	USTAR_typeflag_offset = 156
+  fileprivate static let	USTAR_typeflag_size = 1
+  fileprivate static let	USTAR_linkname_offset = 157
+  fileprivate static let	USTAR_linkname_size = 100
+  fileprivate static let	USTAR_magic_offset = 257
+  fileprivate static let	USTAR_magic_size = 6
+  fileprivate static let	USTAR_version_offset = 263
+  fileprivate static let	USTAR_version_size = 2
+  fileprivate static let	USTAR_uname_offset = 265
+  fileprivate static let	USTAR_uname_size = 32
+  fileprivate static let	USTAR_gname_offset = 297
+  fileprivate static let	USTAR_gname_size = 32
+  fileprivate static let	USTAR_rdevmajor_offset = 329
+  fileprivate static let	USTAR_rdevmajor_size = 6
+  fileprivate static let	USTAR_rdevmajor_max_size = 8
+  fileprivate static let	USTAR_rdevminor_offset = 337
+  fileprivate static let	USTAR_rdevminor_size = 6
+  fileprivate static let	USTAR_rdevminor_max_size = 8
+  fileprivate static let	USTAR_prefix_offset = 345
+  fileprivate static let	USTAR_prefix_size = 155
+  fileprivate static let	USTAR_padding_offset = 500
+  fileprivate static let	USTAR_padding_size = 12
 
-  private static let NullChar: UInt8 = 0
-  private static let ZeroChar: UInt8 = 48
-  private static let MaxChar: UInt8 = 255
-  private static let directoryFlagChar: UInt8 = 53
+  fileprivate static let NullChar: UInt8 = 0
+  fileprivate static let ZeroChar: UInt8 = 48
+  fileprivate static let MaxChar: UInt8 = 255
+  fileprivate static let directoryFlagChar: UInt8 = 53
 
-  private static let template_header: [UInt8] = [
+  fileprivate static let template_header: [UInt8] = [
     00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 32, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 32, 32, 32, 32, 32, 32, 32, 32, 32, 48, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 117, 115, 116, 97, 114, 00, 48, 48, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 48, 48, 48, 48, 48, 48, 32, 00, 48, 48, 48, 48, 48, 48, 32, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00
   ]
 
-  private static func writeFileDataFor(data: NSData, atLocation: UInt64, withLength: Int, atPath: String) {
-    NSFileManager.defaultManager().createFileAtPath(atPath, contents: data.subdataWithRange(NSRange(location: Int(atLocation), length: Int(withLength))), attributes: nil)
+  fileprivate static func writeFileDataFor(_ data: Data, atLocation: Int, withLength: Int, atPath: String) {
+    FileManager.default.createFile(atPath: atPath, contents: data.subdata(in: atLocation..<(atLocation+withLength)), attributes: nil)
   }
 
-  private static func typeFor(data: NSData, atOffset: UInt64) -> UInt8 {
+  fileprivate static func typeFor(_ data: Data, atOffset: Int) -> UInt8 {
     var type: UInt8 = 0
-    let temp = data.subdataWithRange(NSRange(location: Int(atOffset) + TAR_TYPE_POSITION, length: 1))
-    (temp as NSData).getBytes(&type, length: sizeof(UInt8))
+    let temp = data.subdata(in: atOffset+TAR_TYPE_POSITION..<atOffset+TAR_TYPE_POSITION+1)
+    (temp as NSData).getBytes(&type, length: MemoryLayout<UInt8>.size)
     return type
   }
 
-  private static func nameFor(data: NSData, atOffset: UInt64) -> String {
-    let temp = data.subdataWithRange(NSRange(location: Int(atOffset) + TAR_NAME_POSITION, length: TAR_NAME_SIZE))
-    return String(data: temp, encoding:  NSASCIIStringEncoding)!
+  fileprivate static func nameFor(_ data: Data, atOffset: Int) -> String {
+    let temp = data.subdata(in: atOffset+TAR_NAME_POSITION..<atOffset+TAR_NAME_POSITION+TAR_NAME_SIZE)
+    return String(data: temp, encoding:  String.Encoding.ascii)!
   }
 
-  private static func sizeFor(data: NSData, atOffset: UInt64) -> Int {
-    let temp = data.subdataWithRange(NSRange(location: Int(atOffset) + TAR_SIZE_POSITION, length: TAR_SIZE_SIZE))
-    let sizeString = String(data: temp, encoding: NSASCIIStringEncoding)!
+  fileprivate static func sizeFor(_ data: Data, atOffset: Int) -> Int {
+    let temp = data.subdata(in: atOffset+TAR_SIZE_POSITION..<atOffset+TAR_SIZE_POSITION+TAR_SIZE_SIZE)
+    let sizeString = String(data: temp, encoding: String.Encoding.ascii)!
     return strtol(sizeString, nil, 8)
   }
 
 
-  private static func binaryEncodeData(forPath: String, inDirectory: String, isDirectory: Bool) -> NSData {
+  fileprivate static func binaryEncodeData(_ forPath: String, inDirectory: String, isDirectory: ObjCBool) -> Data {
 
     let block = writeHeader(forPath, withBasePath: inDirectory, isDirectory: isDirectory)!
     let data = NSMutableData(bytes: block, length: TAR_BLOCK_SIZE)
-    if !isDirectory {
+    if !isDirectory.boolValue {
       let path = inDirectory + "/" + forPath
 
-      data.appendData(getContentsAsArray(path))
+      data.append(getContentsAsArray(path))
     }
 
-    return data as NSData
+    return data as Data
   }
 
-  private static func writeHeader(forPath: String, withBasePath: String, isDirectory: Bool) -> [UInt8]? {
+  fileprivate static func writeHeader(_ forPath: String, withBasePath: String, isDirectory: ObjCBool) -> [UInt8]? {
 
     var buffer = template_header
 
-    let attributesOptional = try? NSFileManager.defaultManager().attributesOfItemAtPath(withBasePath.stringByAppendingPathComponent(forPath))
+    let attributesOptional = try? FileManager.default.attributesOfItem(atPath: withBasePath.stringByAppendingPathComponent(forPath))
     guard attributesOptional != nil else {
       return nil
     }
     var path =  forPath
-    if isDirectory {
+    if isDirectory.boolValue {
       path += "/"
     }
 
-    let attributes : NSDictionary = attributesOptional!
+    let attributes : NSDictionary = attributesOptional! as NSDictionary
 
     let permissions = Int64(attributes.filePosixPermissions())
     let modificationDate = Int64(attributes.fileModificationDate()!.timeIntervalSince1970)
-    let ownerId = Int64(attributes.fileOwnerAccountID()!.integerValue)
-    let groupId = Int64(attributes.fileGroupOwnerAccountID()!.integerValue)
+    let ownerId = Int64(attributes.fileOwnerAccountID()!.intValue)
+    let groupId = Int64(attributes.fileGroupOwnerAccountID()!.intValue)
     let ownerName = attributes.fileOwnerAccountName() ?? ""
     let groupName = attributes.fileGroupOwnerAccountName() ?? ""
     let fileSize = Int64(attributes.fileSize())
@@ -244,7 +243,7 @@ public struct Tar {
       fatalError("Name too long, not implemented yet")
     }
 
-    if isDirectory {
+    if isDirectory.boolValue {
       formatNumber(0, buffer: &buffer, offset: USTAR_size_offset, size: USTAR_size_size, maxsize: USTAR_size_max_size)
       buffer[USTAR_typeflag_offset] = directoryFlagChar
     }
@@ -261,26 +260,26 @@ public struct Tar {
 
   }
 
-  private static func getContentsAsArray(path: String) -> NSData {
-    let content = NSData(contentsOfURL: NSURL(fileURLWithPath: path))!
-    let contentSize = content.length
+  fileprivate static func getContentsAsArray(_ path: String) -> Data {
+    let content = try! Data(contentsOf: URL(fileURLWithPath: path))
+    let contentSize = content.count
     let padding = (TAR_BLOCK_SIZE - (contentSize % TAR_BLOCK_SIZE)) % TAR_BLOCK_SIZE
-    var buffer = [UInt8](count: padding, repeatedValue: UInt8())
+    var buffer = [UInt8](repeating: UInt8(), count: padding)
     memset(&buffer, Int32(NullChar), padding)
-    let data = NSMutableData(data: content)
-    data.appendBytes(buffer, length: padding)
+    var data = NSData(data: content) as Data
+    data.append(buffer, count: padding)
     return data
   }
 
 
-  private static func getStringAsArray(string: String, withLength: Int) -> [UInt8] {
-    let stringData = string.dataUsingEncoding(NSASCIIStringEncoding)
-    var charArray = [UInt8](count: withLength, repeatedValue: UInt8())
-    stringData?.getBytes(&charArray, length:(stringData?.length)!)
+  fileprivate static func getStringAsArray(_ string: String, withLength: Int) -> [UInt8] {
+    let stringData = string.data(using: String.Encoding.ascii)
+    var charArray = [UInt8](repeating: UInt8(), count: withLength)
+    (stringData as NSData?)?.getBytes(&charArray, length:(stringData?.count)!)
     return charArray
   }
 
-  private static func formatNumber(value: Int64, inout buffer: [UInt8], offset: Int, size: Int, maxsize: Int) {
+  fileprivate static func formatNumber(_ value: Int64, buffer: inout [UInt8], offset: Int, size: Int, maxsize: Int) {
     var limit: Int64 = 1 << (Int64(size) * 3)
 
     if value >= 0 {
@@ -296,7 +295,7 @@ public struct Tar {
 
   }
 
-  private static func formatOctal(value: Int64, inout buffer: [UInt8], offset: Int, size: Int) {
+  fileprivate static func formatOctal(_ value: Int64, buffer: inout [UInt8], offset: Int, size: Int) {
     let len = size
 
     if value < 0 {
@@ -325,7 +324,7 @@ public struct Tar {
   }
 
 
-  private static func format256(value: Int64, inout buffer: [UInt8], offset: Int, maxsize: Int) {
+  fileprivate static func format256(_ value: Int64, buffer: inout [UInt8], offset: Int, maxsize: Int) {
     var valueCopy = value
     for i in 0..<maxsize {
       buffer[offset + maxsize - i] = UInt8(valueCopy & 0xff)
