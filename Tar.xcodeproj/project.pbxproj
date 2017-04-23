@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84348A4A1EACDB5C00536EA0 /* GZIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84348A431EACDB5400536EA0 /* GZIP.framework */; };
 		84C4BA011D3CD28100E07625 /* Tar.h in Headers */ = {isa = PBXBuildFile; fileRef = 84C4BA001D3CD28100E07625 /* Tar.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		84C4BA081D3CD28100E07625 /* Tar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4B9FD1D3CD28100E07625 /* Tar.framework */; };
 		84C4BA191D3CD2AA00E07625 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA171D3CD2AA00E07625 /* Compression.swift */; };
@@ -23,6 +24,34 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		84348A421EACDB5400536EA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3AE36CBF1B8F598E00923C2D;
+			remoteInfo = "GZIP-iOS";
+		};
+		84348A441EACDB5400536EA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3AE36CDB1B8F5AEF00923C2D;
+			remoteInfo = "GZIP-OSX";
+		};
+		84348A461EACDB5400536EA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3AB1CB071B8F671100D54E3D;
+			remoteInfo = "GZIP-watchOS";
+		};
+		84348A481EACDB5400536EA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3A733BCC1BA9B6BD00089A82;
+			remoteInfo = GZIPTests;
+		};
 		84C4BA091D3CD28100E07625 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 84C4B9F41D3CD28100E07625 /* Project object */;
@@ -33,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GZIP.xcodeproj; path = GZIP/GZIP.xcodeproj; sourceTree = "<group>"; };
 		84C4B9FD1D3CD28100E07625 /* Tar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Tar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		84C4BA001D3CD28100E07625 /* Tar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tar.h; sourceTree = "<group>"; };
 		84C4BA021D3CD28100E07625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -56,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84348A4A1EACDB5C00536EA0 /* GZIP.framework in Frameworks */,
 				84C4BA2C1D3CD2F700E07625 /* libcompression.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -71,9 +102,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		84348A3C1EACDB5400536EA0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84348A431EACDB5400536EA0 /* GZIP.framework */,
+				84348A451EACDB5400536EA0 /* GZIP.framework */,
+				84348A471EACDB5400536EA0 /* GZIP.framework */,
+				84348A491EACDB5400536EA0 /* GZIPTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		84C4B9F31D3CD28100E07625 = {
 			isa = PBXGroup;
 			children = (
+				84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */,
 				84C4BA2B1D3CD2F700E07625 /* libcompression.tbd */,
 				84C4B9FF1D3CD28100E07625 /* Tar */,
 				84C4BA0B1D3CD28100E07625 /* TarTests */,
@@ -197,6 +240,12 @@
 			mainGroup = 84C4B9F31D3CD28100E07625;
 			productRefGroup = 84C4B9FE1D3CD28100E07625 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 84348A3C1EACDB5400536EA0 /* Products */;
+					ProjectRef = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				84C4B9FC1D3CD28100E07625 /* Tar */,
@@ -204,6 +253,37 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		84348A431EACDB5400536EA0 /* GZIP.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GZIP.framework;
+			remoteRef = 84348A421EACDB5400536EA0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84348A451EACDB5400536EA0 /* GZIP.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GZIP.framework;
+			remoteRef = 84348A441EACDB5400536EA0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84348A471EACDB5400536EA0 /* GZIP.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = GZIP.framework;
+			remoteRef = 84348A461EACDB5400536EA0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		84348A491EACDB5400536EA0 /* GZIPTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GZIPTests.xctest;
+			remoteRef = 84348A481EACDB5400536EA0 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		84C4B9FB1D3CD28100E07625 /* Resources */ = {

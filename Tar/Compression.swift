@@ -1,5 +1,6 @@
 import Foundation
 import Compression
+import GZIP
 
 /// A convenience class for compressing an NSData object.
 ///
@@ -17,22 +18,30 @@ extension Data {
     case lzfse
     case lzma
     case zlib
+    case gzip
 
-    public func algorithm() -> compression_algorithm {
+    public func algorithm() -> compression_algorithm? {
       switch self {
       case .lz4: return COMPRESSION_LZ4
       case .lzfse: return COMPRESSION_LZFSE
       case .lzma: return COMPRESSION_LZMA
       case .zlib: return COMPRESSION_ZLIB
+      default: return nil
       }
     }
   }
 
   public func compressedData(_ usingAlgorithm: Algorithm) -> Data? {
+    if usingAlgorithm == .gzip {
+      return (self as NSData).gzipped()
+    }
     return processData(self, algorithm: usingAlgorithm, compress: true)
   }
 
   public func decompressedData(_ usingAlgorithm: Algorithm) -> Data? {
+    if usingAlgorithm == .gzip {
+      return (self as NSData).gunzipped()
+    }
     return processData(self, algorithm: usingAlgorithm, compress: false)
   }
 
@@ -41,7 +50,11 @@ extension Data {
 
     var stream = UnsafeMutablePointer<compression_stream>.allocate(capacity: 1).pointee
 
-    let initStatus = compression_stream_init(&stream, compress ? COMPRESSION_STREAM_ENCODE : COMPRESSION_STREAM_DECODE, algorithm.algorithm())
+    guard let algorithm = algorithm.algorithm() else {
+      fatalError("Must not pass GZIP")
+    }
+
+    let initStatus = compression_stream_init(&stream, compress ? COMPRESSION_STREAM_ENCODE : COMPRESSION_STREAM_DECODE, algorithm)
     guard initStatus != COMPRESSION_STATUS_ERROR else {
       print("[Compression] \(compress ? "Compression" : "Decompression") with \(algorithm) failed to init stream with status \(initStatus).")
       return nil
