@@ -1,0 +1,3 @@
+[submodule "GZIP"]
+	path = GZIP
+	url = https://github.com/nicklockwood/GZIP
