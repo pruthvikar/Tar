@@ -52,6 +52,13 @@
 			remoteGlobalIDString = 3A733BCC1BA9B6BD00089A82;
 			remoteInfo = GZIPTests;
 		};
+		84348A5B1EACE56000536EA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AE36CBE1B8F598E00923C2D;
+			remoteInfo = "GZIP-iOS";
+		};
 		84C4BA091D3CD28100E07625 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 84C4B9F41D3CD28100E07625 /* Project object */;
@@ -186,6 +193,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				84348A5C1EACE56000536EA0 /* PBXTargetDependency */,
 			);
 			name = Tar;
 			productName = Tar;
@@ -330,6 +338,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		84348A5C1EACE56000536EA0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "GZIP-iOS";
+			targetProxy = 84348A5B1EACE56000536EA0 /* PBXContainerItemProxy */;
+		};
 		84C4BA0A1D3CD28100E07625 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 84C4B9FC1D3CD28100E07625 /* Tar */;
