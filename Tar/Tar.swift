@@ -36,8 +36,8 @@ extension Tar {
       }
     }
 
-  public static func tar(_ path: String, toPath: String, using: Data.Algorithm? = nil) {
-    let data = _tar(path)
+  public static func tar(_ path: String, toPath: String, exclude: [String]? = nil, using: Data.Algorithm? = nil) {
+    let data = _tar(path, exclude: exclude)
     if let algorithm = using {
       try? data.compressedData(algorithm)!.write(to: URL(fileURLWithPath: toPath), options: [.atomic])
     } else {
@@ -45,8 +45,8 @@ extension Tar {
     }
   }
 
-  public static func tar(_ path:String, using: Data.Algorithm? = nil) -> Data {
-    let data = _tar(path)
+  public static func tar(_ path:String, exclude: [String]? = nil, using: Data.Algorithm? = nil) -> Data {
+    let data = _tar(path, exclude: exclude)
     if let algorithm = using {
       return data.compressedData(algorithm)!
     } else {
@@ -54,7 +54,7 @@ extension Tar {
     }
   }
 
-  static func _tar(_ path: String) -> Data {
+  static func _tar(_ path: String, exclude: [String]? = nil) -> Data {
 
     let fm = FileManager.default
     let md = NSMutableData()
@@ -62,7 +62,13 @@ extension Tar {
 
       for filePath in fm.enumerator(atPath: path)! {
         var isDir = ObjCBool(false)
-
+        if let exclude = exclude {
+          for path in exclude {
+              if filePath == path {
+              continue
+            }
+          }
+        }
         fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
         let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: isDir)
         md.append(tarContent)
