@@ -55,16 +55,14 @@ extension Tar {
   }
 
   static func _tar(_ path: String, exclude: [String]? = nil) -> Data {
-
     let fm = FileManager.default
     let md = NSMutableData()
     if fm.fileExists(atPath: path) {
-
       for filePath in fm.enumerator(atPath: path)! {
         var isDir = ObjCBool(false)
         if let exclude = exclude {
           for path in exclude {
-              if filePath == path {
+            if (filePath as! String) == path {
               continue
             }
           }
