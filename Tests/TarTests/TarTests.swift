@@ -21,6 +21,7 @@ class TarTests: XCTestCase {
     super.tearDown()
   }
 
+
   func testArchiveZLIB() {
     let testData = try! Data(contentsOf: URL(fileURLWithPath: Bundle(for: TarTests.self).path(forResource: "TestData", ofType: "zlib")!))
 
@@ -116,5 +117,9 @@ class TarTests: XCTestCase {
       XCTFail("Untar - data is not equal")
     }
   }
-  
+
+  static var allTests = [
+    ("testTar", testTar),
+    ("testUntar", testUntar)
+    ]
 }

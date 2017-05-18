@@ -12,15 +12,18 @@
 		84C4BA081D3CD28100E07625 /* Tar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4B9FD1D3CD28100E07625 /* Tar.framework */; };
 		84C4BA191D3CD2AA00E07625 /* Compression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA171D3CD2AA00E07625 /* Compression.swift */; };
 		84C4BA1A1D3CD2AA00E07625 /* Tar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA181D3CD2AA00E07625 /* Tar.swift */; };
-		84C4BA211D3CD2B800E07625 /* TestData.tar in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1B1D3CD2B800E07625 /* TestData.tar */; };
-		84C4BA221D3CD2B800E07625 /* TestData.lz4 in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1C1D3CD2B800E07625 /* TestData.lz4 */; };
-		84C4BA231D3CD2B800E07625 /* TestData.lzfse in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1D1D3CD2B800E07625 /* TestData.lzfse */; };
-		84C4BA241D3CD2B800E07625 /* TestData.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1E1D3CD2B800E07625 /* TestData.lzma */; };
-		84C4BA251D3CD2B800E07625 /* TestData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA1F1D3CD2B800E07625 /* TestData.txt */; };
-		84C4BA261D3CD2B800E07625 /* TestData.zlib in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA201D3CD2B800E07625 /* TestData.zlib */; };
-		84C4BA281D3CD2BE00E07625 /* tar in Resources */ = {isa = PBXBuildFile; fileRef = 84C4BA271D3CD2BE00E07625 /* tar */; };
-		84C4BA2A1D3CD2E000E07625 /* TarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C4BA291D3CD2E000E07625 /* TarTests.swift */; };
 		84C4BA2C1D3CD2F700E07625 /* libcompression.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4BA2B1D3CD2F700E07625 /* libcompression.tbd */; };
+		84F25F781ECDA953006F0CBD /* sample1.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F691ECDA953006F0CBD /* sample1.txt */; };
+		84F25F791ECDA953006F0CBD /* sample2.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F6B1ECDA953006F0CBD /* sample2.txt */; };
+		84F25F7A1ECDA953006F0CBD /* sample3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F6C1ECDA953006F0CBD /* sample3.txt */; };
+		84F25F7B1ECDA953006F0CBD /* sample4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F6E1ECDA953006F0CBD /* sample4.txt */; };
+		84F25F7D1ECDA953006F0CBD /* TestData.lz4 in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F701ECDA953006F0CBD /* TestData.lz4 */; };
+		84F25F7E1ECDA953006F0CBD /* TestData.lzfse in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F711ECDA953006F0CBD /* TestData.lzfse */; };
+		84F25F7F1ECDA953006F0CBD /* TestData.lzma in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F721ECDA953006F0CBD /* TestData.lzma */; };
+		84F25F801ECDA953006F0CBD /* TestData.tar in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F731ECDA953006F0CBD /* TestData.tar */; };
+		84F25F811ECDA953006F0CBD /* TestData.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F741ECDA953006F0CBD /* TestData.txt */; };
+		84F25F821ECDA953006F0CBD /* TestData.zlib in Resources */ = {isa = PBXBuildFile; fileRef = 84F25F751ECDA953006F0CBD /* TestData.zlib */; };
+		84F25F831ECDA97F006F0CBD /* TarTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F25F6F1ECDA953006F0CBD /* TarTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,18 +77,20 @@
 		84C4BA001D3CD28100E07625 /* Tar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tar.h; sourceTree = "<group>"; };
 		84C4BA021D3CD28100E07625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84C4BA071D3CD28100E07625 /* TarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		84C4BA0E1D3CD28100E07625 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84C4BA171D3CD2AA00E07625 /* Compression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Compression.swift; sourceTree = "<group>"; };
 		84C4BA181D3CD2AA00E07625 /* Tar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tar.swift; sourceTree = "<group>"; };
-		84C4BA1B1D3CD2B800E07625 /* TestData.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = TestData.tar; sourceTree = "<group>"; };
-		84C4BA1C1D3CD2B800E07625 /* TestData.lz4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lz4; sourceTree = "<group>"; };
-		84C4BA1D1D3CD2B800E07625 /* TestData.lzfse */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lzfse; sourceTree = "<group>"; };
-		84C4BA1E1D3CD2B800E07625 /* TestData.lzma */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lzma; sourceTree = "<group>"; };
-		84C4BA1F1D3CD2B800E07625 /* TestData.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestData.txt; sourceTree = "<group>"; };
-		84C4BA201D3CD2B800E07625 /* TestData.zlib */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.zlib; sourceTree = "<group>"; };
-		84C4BA271D3CD2BE00E07625 /* tar */ = {isa = PBXFileReference; lastKnownFileType = folder; path = tar; sourceTree = "<group>"; };
-		84C4BA291D3CD2E000E07625 /* TarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TarTests.swift; sourceTree = "<group>"; };
 		84C4BA2B1D3CD2F700E07625 /* libcompression.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcompression.tbd; path = usr/lib/libcompression.tbd; sourceTree = SDKROOT; };
+		84F25F691ECDA953006F0CBD /* sample1.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sample1.txt; sourceTree = "<group>"; };
+		84F25F6B1ECDA953006F0CBD /* sample2.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sample2.txt; sourceTree = "<group>"; };
+		84F25F6C1ECDA953006F0CBD /* sample3.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sample3.txt; sourceTree = "<group>"; };
+		84F25F6E1ECDA953006F0CBD /* sample4.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sample4.txt; sourceTree = "<group>"; };
+		84F25F6F1ECDA953006F0CBD /* TarTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TarTests.swift; sourceTree = "<group>"; };
+		84F25F701ECDA953006F0CBD /* TestData.lz4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lz4; sourceTree = "<group>"; };
+		84F25F711ECDA953006F0CBD /* TestData.lzfse */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lzfse; sourceTree = "<group>"; };
+		84F25F721ECDA953006F0CBD /* TestData.lzma */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.lzma; sourceTree = "<group>"; };
+		84F25F731ECDA953006F0CBD /* TestData.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = TestData.tar; sourceTree = "<group>"; };
+		84F25F741ECDA953006F0CBD /* TestData.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestData.txt; sourceTree = "<group>"; };
+		84F25F751ECDA953006F0CBD /* TestData.zlib */ = {isa = PBXFileReference; lastKnownFileType = file; path = TestData.zlib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,10 +128,10 @@
 		84C4B9F31D3CD28100E07625 = {
 			isa = PBXGroup;
 			children = (
+				84F25F631ECDA953006F0CBD /* Tests */,
 				84348A3B1EACDB5400536EA0 /* GZIP.xcodeproj */,
 				84C4BA2B1D3CD2F700E07625 /* libcompression.tbd */,
 				84C4B9FF1D3CD28100E07625 /* Tar */,
-				84C4BA0B1D3CD28100E07625 /* TarTests */,
 				84C4B9FE1D3CD28100E07625 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -151,20 +156,62 @@
 			path = Tar;
 			sourceTree = "<group>";
 		};
-		84C4BA0B1D3CD28100E07625 /* TarTests */ = {
+		84F25F631ECDA953006F0CBD /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				84C4BA271D3CD2BE00E07625 /* tar */,
-				84C4BA1B1D3CD2B800E07625 /* TestData.tar */,
-				84C4BA1C1D3CD2B800E07625 /* TestData.lz4 */,
-				84C4BA1D1D3CD2B800E07625 /* TestData.lzfse */,
-				84C4BA1E1D3CD2B800E07625 /* TestData.lzma */,
-				84C4BA1F1D3CD2B800E07625 /* TestData.txt */,
-				84C4BA201D3CD2B800E07625 /* TestData.zlib */,
-				84C4BA291D3CD2E000E07625 /* TarTests.swift */,
-				84C4BA0E1D3CD28100E07625 /* Info.plist */,
+				84F25F651ECDA953006F0CBD /* TarTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		84F25F651ECDA953006F0CBD /* TarTests */ = {
+			isa = PBXGroup;
+			children = (
+				84F25F671ECDA953006F0CBD /* tar */,
+				84F25F6F1ECDA953006F0CBD /* TarTests.swift */,
+				84F25F701ECDA953006F0CBD /* TestData.lz4 */,
+				84F25F711ECDA953006F0CBD /* TestData.lzfse */,
+				84F25F721ECDA953006F0CBD /* TestData.lzma */,
+				84F25F731ECDA953006F0CBD /* TestData.tar */,
+				84F25F741ECDA953006F0CBD /* TestData.txt */,
+				84F25F751ECDA953006F0CBD /* TestData.zlib */,
 			);
 			path = TarTests;
+			sourceTree = "<group>";
+		};
+		84F25F671ECDA953006F0CBD /* tar */ = {
+			isa = PBXGroup;
+			children = (
+				84F25F681ECDA953006F0CBD /* TestData */,
+			);
+			path = tar;
+			sourceTree = "<group>";
+		};
+		84F25F681ECDA953006F0CBD /* TestData */ = {
+			isa = PBXGroup;
+			children = (
+				84F25F691ECDA953006F0CBD /* sample1.txt */,
+				84F25F6A1ECDA953006F0CBD /* subfolder1 */,
+			);
+			path = TestData;
+			sourceTree = "<group>";
+		};
+		84F25F6A1ECDA953006F0CBD /* subfolder1 */ = {
+			isa = PBXGroup;
+			children = (
+				84F25F6B1ECDA953006F0CBD /* sample2.txt */,
+				84F25F6C1ECDA953006F0CBD /* sample3.txt */,
+				84F25F6D1ECDA953006F0CBD /* subfolder2 */,
+			);
+			path = subfolder1;
+			sourceTree = "<group>";
+		};
+		84F25F6D1ECDA953006F0CBD /* subfolder2 */ = {
+			isa = PBXGroup;
+			children = (
+				84F25F6E1ECDA953006F0CBD /* sample4.txt */,
+			);
+			path = subfolder2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,6 +345,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84F25F781ECDA953006F0CBD /* sample1.txt in Resources */,
+				84F25F7F1ECDA953006F0CBD /* TestData.lzma in Resources */,
+				84F25F801ECDA953006F0CBD /* TestData.tar in Resources */,
+				84F25F7B1ECDA953006F0CBD /* sample4.txt in Resources */,
+				84F25F7A1ECDA953006F0CBD /* sample3.txt in Resources */,
+				84F25F811ECDA953006F0CBD /* TestData.txt in Resources */,
+				84F25F7D1ECDA953006F0CBD /* TestData.lz4 in Resources */,
+				84F25F7E1ECDA953006F0CBD /* TestData.lzfse in Resources */,
+				84F25F791ECDA953006F0CBD /* sample2.txt in Resources */,
+				84F25F821ECDA953006F0CBD /* TestData.zlib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,13 +362,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84C4BA221D3CD2B800E07625 /* TestData.lz4 in Resources */,
-				84C4BA251D3CD2B800E07625 /* TestData.txt in Resources */,
-				84C4BA241D3CD2B800E07625 /* TestData.lzma in Resources */,
-				84C4BA211D3CD2B800E07625 /* TestData.tar in Resources */,
-				84C4BA261D3CD2B800E07625 /* TestData.zlib in Resources */,
-				84C4BA231D3CD2B800E07625 /* TestData.lzfse in Resources */,
-				84C4BA281D3CD2BE00E07625 /* tar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -331,7 +381,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84C4BA2A1D3CD2E000E07625 /* TarTests.swift in Sources */,
+				84F25F831ECDA97F006F0CBD /* TarTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

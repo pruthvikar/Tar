@@ -15,43 +15,21 @@ extension String {
 }
 
 extension Tar {
-
-
-  public static func untar(_ path: String, toPath: String, using: Data.Algorithm? = nil) {
-    let data : Data = {
-      if let algorithm = using {
-        return (try! Data(contentsOf: URL(fileURLWithPath: path))).decompressedData(algorithm)!
-      } else {
-        return (try! Data(contentsOf: URL(fileURLWithPath: path)))
-      }
-    }()
+  public static func untar(_ path: String, toPath: String) throws {
+    let data = try Data(contentsOf: URL(fileURLWithPath: path))
     _untar(data, toPath: toPath)
   }
 
-  public static func untar(_ data:Data, toPath: String, using: Data.Algorithm? = nil) {
-      if let algorithm = using {
-        _untar(data.decompressedData(algorithm)!, toPath: toPath)
-      } else {
-        _untar(data, toPath: toPath)
-      }
-    }
-
-  public static func tar(_ path: String, toPath: String, exclude: [String]? = nil, using: Data.Algorithm? = nil) {
-    let data = _tar(path, exclude: exclude)
-    if let algorithm = using {
-      try? data.compressedData(algorithm)!.write(to: URL(fileURLWithPath: toPath), options: [.atomic])
-    } else {
-      try? data.write(to: URL(fileURLWithPath: toPath), options: [.atomic])
-    }
+  public static func untar(_ data: Data, toPath: String) {
+    _untar(data, toPath: toPath)
   }
 
-  public static func tar(_ path:String, exclude: [String]? = nil, using: Data.Algorithm? = nil) -> Data {
-    let data = _tar(path, exclude: exclude)
-    if let algorithm = using {
-      return data.compressedData(algorithm)!
-    } else {
-      return data
-    }
+  public static func tar(_ path: String, toPath: String, exclude: [String]? = nil) throws {
+    try _tar(path, exclude: exclude).write(to: URL(fileURLWithPath: toPath), options: [.atomic])
+  }
+
+  public static func tar(_ path:String, exclude: [String]? = nil) -> Data {
+    return _tar(path, exclude: exclude)
   }
 
   static func _tar(_ path: String, exclude: [String]? = nil) -> Data {
@@ -59,16 +37,17 @@ extension Tar {
     let md = NSMutableData()
     if fm.fileExists(atPath: path) {
       for filePath in fm.enumerator(atPath: path)! {
+        let filePathString = filePath as! String
         var isDir = ObjCBool(false)
         if let exclude = exclude {
           for path in exclude {
-            if (filePath as! String) == path {
+            if filePathString == path {
               continue
             }
           }
         }
         fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: isDir)
+        let tarContent = binaryEncodeData(filePathString, inDirectory: path, isDirectory: isDir)
         md.append(tarContent)
       }
       var block = [UInt8](repeating: UInt8(), count: TAR_BLOCK_SIZE * 2)
