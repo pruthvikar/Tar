@@ -38,7 +38,6 @@ extension Tar {
     if fm.fileExists(atPath: path) {
       for filePath in fm.enumerator(atPath: path)! {
         let filePathString = filePath as! String
-        var isDir = ObjCBool(false)
         if let exclude = exclude {
           for path in exclude {
             if filePathString == path {
@@ -46,9 +45,11 @@ extension Tar {
             }
           }
         }
-        fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePathString, inDirectory: path, isDirectory: isDir)
-        md.append(tarContent)
+        if let resourceValues = try? URL(fileURLWithPath: filePath as! String).resourceValues(forKeys: [.isDirectoryKey]) {
+            let tarContent = binaryEncodeData(filePathString, inDirectory: path, isDirectory: resourceValues.isDirectory!)
+            md.append(tarContent)
+        }
+
       }
       var block = [UInt8](repeating: UInt8(), count: TAR_BLOCK_SIZE * 2)
       memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
@@ -172,12 +173,12 @@ public struct Tar {
     return strtol(sizeString, nil, 8)
   }
 
-  fileprivate static func binaryEncodeData(_ forPath: String, inDirectory: String, isDirectory: ObjCBool) -> Data {
+  fileprivate static func binaryEncodeData(_ forPath: String, inDirectory: String, isDirectory: Bool) -> Data {
     let block = writeHeader(forPath, withBasePath: inDirectory, isDirectory: isDirectory)!
 
     var data = Data(bytes: block, count: TAR_BLOCK_SIZE)
 
-    if !isDirectory.boolValue {
+    if !isDirectory {
       let path = inDirectory + "/" + forPath
       data.append(getContentsAsArray(path))
     }
@@ -185,7 +186,7 @@ public struct Tar {
     return data
   }
 
-  fileprivate static func writeHeader(_ forPath: String, withBasePath: String, isDirectory: ObjCBool) -> [UInt8]? {
+  fileprivate static func writeHeader(_ forPath: String, withBasePath: String, isDirectory: Bool) -> [UInt8]? {
 
 
     guard let attributes = try? FileManager.default.attributesOfItem(atPath: withBasePath.stringByAppendingPathComponent(forPath)) else {
@@ -194,7 +195,7 @@ public struct Tar {
     var buffer = template_header
 
     var path = forPath
-    if isDirectory.boolValue {
+    if isDirectory {
       path += "/"
     }
 
@@ -227,7 +228,7 @@ public struct Tar {
       fatalError("Name too long, not implemented yet")
     }
 
-    if isDirectory.boolValue {
+    if isDirectory {
       formatNumber(0, buffer: &buffer, offset: USTAR_size_offset, size: USTAR_size_size, maxsize: USTAR_size_max_size)
       buffer[USTAR_typeflag_offset] = directoryFlagChar
     }
