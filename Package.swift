@@ -4,4 +4,8 @@ import PackageDescription
 
 let package = Package(
   name: "Tar",
-  exclude: ["Sources/Compression"])
+  dependencies: [
+    .Package(url: "https://github.com/pruthvikar/GZIP.git", "1.0.0-beta.1")
+  ],
+  exclude: ["Sources/Compression"]
+)
