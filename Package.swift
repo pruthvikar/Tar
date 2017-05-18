@@ -3,5 +3,5 @@
 import PackageDescription
 
 let package = Package(
-    name: "Tar"
-)
+  name: "Tar",
+  exclude: ["Sources/Compression"])
