@@ -10,7 +10,7 @@ import Foundation
 
 extension String {
   func stringByAppendingPathComponent(_ pathComponent: String) -> String {
-    return (self as NSString).appendingPathComponent(pathComponent)
+    return URL(fileURLWithPath: self).appendingPathComponent(pathComponent).absoluteString
   }
 }
 
@@ -34,7 +34,7 @@ extension Tar {
 
   static func _tar(_ path: String, exclude: [String]? = nil) -> Data {
     let fm = FileManager.default
-    let md = NSMutableData()
+    var md = Data()
     if fm.fileExists(atPath: path) {
       for filePath in fm.enumerator(atPath: path)! {
         let filePathString = filePath as! String
@@ -53,7 +53,7 @@ extension Tar {
       var block = [UInt8](repeating: UInt8(), count: TAR_BLOCK_SIZE * 2)
       memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
       md.append(Data(bytes: UnsafePointer<UInt8>(UnsafePointer<UInt8>(block)), count: block.count))
-      return md as Data
+      return md
     }
 
     return Data()
@@ -156,9 +156,8 @@ public struct Tar {
   }
 
   fileprivate static func typeFor(_ data: Data, atOffset: Int) -> UInt8 {
-    var type: UInt8 = 0
     let temp = data.subdata(in: atOffset+TAR_TYPE_POSITION..<atOffset+TAR_TYPE_POSITION+1)
-    (temp as NSData).getBytes(&type, length: MemoryLayout<UInt8>.size)
+    let type: UInt8 = temp.toValue()
     return type
   }
 
@@ -173,52 +172,54 @@ public struct Tar {
     return strtol(sizeString, nil, 8)
   }
 
-
   fileprivate static func binaryEncodeData(_ forPath: String, inDirectory: String, isDirectory: ObjCBool) -> Data {
-
     let block = writeHeader(forPath, withBasePath: inDirectory, isDirectory: isDirectory)!
-    let data = NSMutableData(bytes: block, length: TAR_BLOCK_SIZE)
+
+    var data = Data(bytes: block, count: TAR_BLOCK_SIZE)
+
     if !isDirectory.boolValue {
       let path = inDirectory + "/" + forPath
-
       data.append(getContentsAsArray(path))
     }
 
-    return data as Data
+    return data
   }
 
   fileprivate static func writeHeader(_ forPath: String, withBasePath: String, isDirectory: ObjCBool) -> [UInt8]? {
 
-    var buffer = template_header
 
-    let attributesOptional = try? FileManager.default.attributesOfItem(atPath: withBasePath.stringByAppendingPathComponent(forPath))
-    guard attributesOptional != nil else {
+    guard let attributes = try? FileManager.default.attributesOfItem(atPath: withBasePath.stringByAppendingPathComponent(forPath)) else {
       return nil
     }
-    var path =  forPath
+    var buffer = template_header
+
+    var path = forPath
     if isDirectory.boolValue {
       path += "/"
     }
 
-    let attributes : NSDictionary = attributesOptional! as NSDictionary
+    guard let permissions = attributes[.posixPermissions] as? Int,
+          let modificationDate = attributes[.modificationDate] as? Date,
+          let ownerId = attributes[.ownerAccountID] as? Int,
+          let groupId = attributes[.groupOwnerAccountID] as? Int,
+          let ownerName = attributes[.ownerAccountName] as? String,
+          let groupName = attributes[.groupOwnerAccountName] as? String,
+          let fileSize = attributes[.size] as? Int else {
+        return nil
+    }
+    
 
-    let permissions = Int64(attributes.filePosixPermissions())
-    let modificationDate = Int64(attributes.fileModificationDate()!.timeIntervalSince1970)
-    let ownerId = Int64(attributes.fileOwnerAccountID()!.intValue)
-    let groupId = Int64(attributes.fileGroupOwnerAccountID()!.intValue)
-    let ownerName = attributes.fileOwnerAccountName() ?? ""
-    let groupName = attributes.fileGroupOwnerAccountName() ?? ""
-    let fileSize = Int64(attributes.fileSize())
     let nameChar = getStringAsArray(path, withLength: USTAR_name_size)
     let unameChar = getStringAsArray(ownerName, withLength: USTAR_uname_size)
+
     memcpy(&buffer[USTAR_uname_offset], unameChar, unameChar.count)
     let gnameChar = getStringAsArray(groupName, withLength: USTAR_gname_size)
     memcpy(&buffer[USTAR_gname_offset], gnameChar, gnameChar.count)
-    formatNumber(permissions & 4095, buffer: &buffer, offset: USTAR_mode_offset, size: USTAR_mode_size, maxsize: USTAR_mode_max_size)
-    formatNumber(ownerId, buffer: &buffer, offset: USTAR_uid_offset, size: USTAR_uid_size, maxsize: USTAR_uid_max_size)
-    formatNumber(groupId, buffer: &buffer, offset: USTAR_gid_offset, size: USTAR_gid_size, maxsize: USTAR_gid_max_size)
-    formatNumber(fileSize, buffer: &buffer, offset: USTAR_size_offset, size: USTAR_size_size, maxsize: USTAR_size_max_size)
-    formatNumber(modificationDate, buffer: &buffer, offset: USTAR_mtime_offset, size: USTAR_mtime_size, maxsize: USTAR_mtime_max_size)
+    formatNumber(Int64(permissions) & 4095, buffer: &buffer, offset: USTAR_mode_offset, size: USTAR_mode_size, maxsize: USTAR_mode_max_size)
+    formatNumber(Int64(ownerId), buffer: &buffer, offset: USTAR_uid_offset, size: USTAR_uid_size, maxsize: USTAR_uid_max_size)
+    formatNumber(Int64(groupId), buffer: &buffer, offset: USTAR_gid_offset, size: USTAR_gid_size, maxsize: USTAR_gid_max_size)
+    formatNumber(Int64(fileSize), buffer: &buffer, offset: USTAR_size_offset, size: USTAR_size_size, maxsize: USTAR_size_max_size)
+    formatNumber(Int64(modificationDate.timeIntervalSince1970), buffer: &buffer, offset: USTAR_mtime_offset, size: USTAR_mtime_size, maxsize: USTAR_mtime_max_size)
     let nameLength = nameChar.count
     if nameLength <= USTAR_name_size {
       memcpy(&buffer[USTAR_name_offset], nameChar, nameLength)
@@ -244,21 +245,24 @@ public struct Tar {
   }
 
   fileprivate static func getContentsAsArray(_ path: String) -> Data {
-    let content = try! Data(contentsOf: URL(fileURLWithPath: path))
+    var content = try! Data(contentsOf: URL(fileURLWithPath: path))
     let contentSize = content.count
     let padding = (TAR_BLOCK_SIZE - (contentSize % TAR_BLOCK_SIZE)) % TAR_BLOCK_SIZE
+
     var buffer = [UInt8](repeating: UInt8(), count: padding)
     memset(&buffer, Int32(NullChar), padding)
-    var data = NSData(data: content) as Data
-    data.append(buffer, count: padding)
-    return data
+
+    content.append(buffer, count: padding)
+
+    return content
   }
 
 
   fileprivate static func getStringAsArray(_ string: String, withLength: Int) -> [UInt8] {
-    let stringData = string.data(using: String.Encoding.ascii)
-    var charArray = [UInt8](repeating: UInt8(), count: withLength)
-    (stringData as NSData?)?.getBytes(&charArray, length:(stringData?.count)!)
+    guard let stringData = string.data(using: String.Encoding.ascii) else {
+      fatalError("String could not be formed")
+    }
+    let charArray: [UInt8] = stringData.toArray()
     return charArray
   }
 
