@@ -1,10 +1,17 @@
-language: swift
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-      sudo: required
-    - os: osx
-      osx_image: xcode8.3
+os:
+    - linux
+    - osx
+language: generic
+sudo: required
+dist: trusty
+
+osx_image: xcode8.3
+before_install:
+    - if [ $TRAVIS_OS_NAME != "osx" ]; then
+            eval "$(curl -sL https://apt.vapor.sh)";
+        fi
+
 script:
-  - swift test
+    - swift build
+    - swift build -c release
+    - swift test
