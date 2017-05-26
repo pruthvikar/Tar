@@ -10,7 +10,7 @@ import Foundation
 
 extension String {
   func stringByAppendingPathComponent(_ pathComponent: String) -> String {
-    return URL(fileURLWithPath: self).appendingPathComponent(pathComponent).absoluteString
+    return URL(fileURLWithPath: self).appendingPathComponent(pathComponent).path
   }
 }
 
