@@ -7,5 +7,8 @@ let package = Package(
   dependencies: [
     .Package(url: "https://github.com/pruthvikar/GZIP.git", "1.0.0-beta.1")
   ],
-  exclude: ["Sources/Compression"]
+  exclude: [
+    "Sources/Compression",
+    "Tests/Data"
+  ]
 )
