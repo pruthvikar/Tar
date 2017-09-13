@@ -62,14 +62,18 @@ extension Tar {
       let fileEnumerator = fm.enumerator(atPath: path)
       while let filePath = fileEnumerator?.nextObject() as? String {
         var isDir = ObjCBool(false)
+        var skip = false
         for excludePath in excludePaths {
           if filePath.starts(with: excludePath) {
+            skip = true
             continue
           }
         }
-        fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
-        let tarContent = binaryEncodeData(filePath as! String, inDirectory: path, isDirectory: isDir)
-        md.append(tarContent)
+        if !skip {
+          fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath), isDirectory: &isDir)
+          let tarContent = binaryEncodeData(filePath, inDirectory: path, isDirectory: isDir)
+          md.append(tarContent)
+        }
       }
       var block = [UInt8](repeating: UInt8(), count: TAR_BLOCK_SIZE * 2)
       memset(&block, Int32(NullChar), TAR_BLOCK_SIZE * 2)
