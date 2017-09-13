@@ -55,16 +55,16 @@ extension Tar {
   }
 
   static func _tar(_ path: String, exclude: [String]? = nil) -> Data {
+    let excludePaths = exclude ?? []
     let fm = FileManager.default
     let md = NSMutableData()
     if fm.fileExists(atPath: path) {
-      for filePath in fm.enumerator(atPath: path)! {
+      let fileEnumerator = fm.enumerator(atPath: path)
+      while let filePath = fileEnumerator?.nextObject() as? String {
         var isDir = ObjCBool(false)
-        if let exclude = exclude {
-          for path in exclude {
-            if (filePath as! String) == path {
-              continue
-            }
+        for excludePath in excludePaths {
+          if filePath.starts(with: excludePath) {
+            continue
           }
         }
         fm.fileExists(atPath: path.stringByAppendingPathComponent(filePath as! String), isDirectory: &isDir)
@@ -76,7 +76,6 @@ extension Tar {
       md.append(Data(bytes: UnsafePointer<UInt8>(UnsafePointer<UInt8>(block)), count: block.count))
       return md as Data
     }
-
     return Data()
   }
 
